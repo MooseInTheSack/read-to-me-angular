@@ -15,10 +15,11 @@ export class AppComponent {
   isRecognitionAvailable = async () => {
     return await this.speechRecognition.isRecognitionAvailable()
     .then((available: boolean) => { 
-      console.log(available)
+      console.log('isRecognitionAvailable: ', available)
       return available;
     })
   }
+  
 
   // Start the recognition process
   startListening() {
@@ -34,11 +35,13 @@ export class AppComponent {
         console.log("ducky matches: ", matches)
         
         //text-to-speech
+        
         this.tts.speak('Hello World')
-          .then(() => console.log('Success'))
+          .then(() => console.log('Successfully spoke'))
           .catch((reason: any) => console.log(reason));
+        
       },
-      (onerror) => console.log('error:', onerror)
+      (onerror) => console.log('startListening error:', onerror)
     )
   }
   
@@ -60,7 +63,7 @@ export class AppComponent {
   hasPermission = async () => {
     return await this.speechRecognition.hasPermission()
     .then((hasPermission: boolean) => {
-      console.log(hasPermission)
+      console.log('hasPermission: ', hasPermission)
       return hasPermission
     })
   }
@@ -70,23 +73,30 @@ export class AppComponent {
     this.speechRecognition.requestPermission()
     .then(
       () => { 
-        console.log('Granted')
-        this.startListening()
+        console.log('3a: Granted')
       },
-      () => console.log('Denied')
+      () => console.log('3b: Denied')
     )
   }
 
   ngOnInit() {
+    
+    this.requestPermission()
+    this.startListening()
+    /*
     if(this.isRecognitionAvailable()) {
+      console.log('1a: ')
       if(this.hasPermission()) {
+        console.log('2a: Permission is available')
         this.startListening()
       } else {
-        console.log("Permission is NOT available for speech recognition...")
+        console.log("2b: Permission is NOT available for speech recognition...")
         this.requestPermission()
       }
     } else {
-      console.log("Speech Recognition is NOT available...")
+      console.log("1b: Speech Recognition is NOT available...")
     }
+    */
   }
+  
 }
