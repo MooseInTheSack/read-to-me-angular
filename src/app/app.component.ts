@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SpeechRecognition } from '@ionic-native/speech-recognition/ngx';
 import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
-
+import { MusicControls } from '@ionic-native/music-controls/ngx';
 
 @Component({
   selector: 'app-root',
@@ -9,97 +9,42 @@ import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(private speechRecognition: SpeechRecognition, private tts: TextToSpeech) {}
+  constructor(private musicControls: MusicControls, private tts: TextToSpeech) {}
 
-  // Check feature available
-  isRecognitionAvailable = async () => {
-    return await this.speechRecognition.isRecognitionAvailable()
-    .then((available: boolean) => { 
-      console.log('isRecognitionAvailable: ', available)
-      return available;
-    })
+  speak = async (textToSpeak: string) => {
+    await this.tts.speak(textToSpeak)
+      .then(() => console.log('Successfully spoke'))
+      .catch((reason: any) => console.log('tts.speak error: ', reason));
   }
-  
 
-  // Start the recognition process
-  startListening() {
-    console.log('ducky in startListening() method')
-    const options = {
-      language: "en-US",
-      matches: 5,
-      showPopup: false,
-      showPartial: false, //maybe this is throwing an error
+  startContentLoop = async () => {
+    //get content from server
+    const testData = [
+      {
+        title: "Test Title 1",
+        content: "Test Content 1"
+      },
+      {
+        title: "Test Title 2",
+        content: "Test Content 2"
+      },
+      {
+        title: "Test Title 3",
+        content: "Test Content 3"
+      }
+    ]
+
+    for(let article of testData) {
+      await this.speak(article.title)
+      
+      await this.speak(article.content)
     }
 
-    this.speechRecognition.startListening(options)
-    .subscribe(
-      (matches: string[]) => {
-        console.log('ducky in this.speechRecognition.startListening() method')
-        console.log("ducky matches: ", matches)
-        
-        //text-to-speech
-        
-        this.tts.speak('Hello World')
-          .then(() => console.log('Successfully spoke'))
-          .catch((reason: any) => console.log('tts.speak error: ', reason));
-        
-      },
-      (onerror) => console.log('startListening error:', onerror)
-    )
-  }
-  
-  // Stop the recognition process (iOS only)
-  stopListening() {
-    this.speechRecognition.stopListening()
-  }
-
-  // Get the list of supported languages
-  getSupportedLanguages() {
-    this.speechRecognition.getSupportedLanguages()
-    .then(
-      (languages: string[]) => console.log(languages),
-      (error) => console.log(error)
-    )
-  }
-
-  // Check permission
-  hasPermission = async () => {
-    return await this.speechRecognition.hasPermission()
-    .then((hasPermission: boolean) => {
-      console.log('hasPermission: ', hasPermission)
-      return hasPermission
-    })
-  }
-
-  // Request permissions
-  requestPermission() {
-    this.speechRecognition.requestPermission()
-    .then(
-      () => { 
-        console.log('3a: Granted')
-      },
-      () => console.log('3b: Denied')
-    )
+    
   }
 
   ngOnInit() {
-    
-    this.requestPermission()
-    this.startListening()
-    /*
-    if(this.isRecognitionAvailable()) {
-      console.log('1a: ')
-      if(this.hasPermission()) {
-        console.log('2a: Permission is available')
-        this.startListening()
-      } else {
-        console.log("2b: Permission is NOT available for speech recognition...")
-        this.requestPermission()
-      }
-    } else {
-      console.log("1b: Speech Recognition is NOT available...")
-    }
-    */
+    this.startContentLoop()
   }
   
 }
