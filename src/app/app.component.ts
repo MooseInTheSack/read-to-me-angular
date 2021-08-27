@@ -23,22 +23,25 @@ export class AppComponent {
 
   // Start the recognition process
   startListening() {
+    console.log('ducky in startListening() method')
     const options = {
       language: "en-US",
-      matches: 20,
-      showPopup: false
+      matches: 5,
+      showPopup: false,
+      showPartial: false, //maybe this is throwing an error
     }
 
     this.speechRecognition.startListening(options)
     .subscribe(
       (matches: string[]) => {
+        console.log('ducky in this.speechRecognition.startListening() method')
         console.log("ducky matches: ", matches)
         
         //text-to-speech
         
         this.tts.speak('Hello World')
           .then(() => console.log('Successfully spoke'))
-          .catch((reason: any) => console.log(reason));
+          .catch((reason: any) => console.log('tts.speak error: ', reason));
         
       },
       (onerror) => console.log('startListening error:', onerror)
